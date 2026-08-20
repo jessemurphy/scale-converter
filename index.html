@@ -40,7 +40,7 @@ h2{font-size:14px;font-weight:700;text-transform:uppercase;
 .row{display:flex;gap:8px;margin:10px 0;align-items:center}
 input,select{font:inherit;color:var(--ink);background:var(--card);
   border:1px solid var(--rule);border-radius:10px;padding:11px 12px}
-input[type=number]{width:100%;font-variant-numeric:tabular-nums}
+input[type=number],input[type=text]{width:100%;font-variant-numeric:tabular-nums}
 select{flex-shrink:0;max-width:46%}
 label{font-size:13px;font-weight:700;text-transform:uppercase;
   letter-spacing:.07em;color:var(--muted);display:block;margin:0 0 6px}
@@ -78,19 +78,45 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
     <div class="card">
       <label for="from-val">From</label>
       <div class="row" style="margin-top:0">
-        <input type="number" id="from-val" inputmode="decimal" step="any"
-               placeholder="value">
+        <input type="text" id="from-val" autocomplete="off" autocapitalize="off"
+               spellcheck="false" placeholder="value or 1 1/2">
         <select id="from-unit" aria-label="From unit"></select>
       </div>
       <div class="swap">&darr;&uarr;</div>
       <label for="to-val">To</label>
       <div class="row" style="margin-top:0">
-        <input type="number" id="to-val" inputmode="decimal" step="any"
-               placeholder="value">
+        <input type="text" id="to-val" autocomplete="off" autocapitalize="off"
+               spellcheck="false" placeholder="value or 3/4">
         <select id="to-unit" aria-label="To unit"></select>
       </div>
       <p class="big" id="u-result"></p>
       <div class="all" id="u-all"></div>
+    </div>
+  </section>
+
+  <!-- ============ custom ratio ============ -->
+  <section id="v-ratio" class="hide">
+    <div class="card">
+      <label>Ratio &mdash; from : to</label>
+      <div class="row" style="margin-top:0">
+        <input type="text" id="ratio-a" placeholder="2" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+        <span style="color:var(--muted);font-weight:800">:</span>
+        <input type="text" id="ratio-b" placeholder="3" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+      </div>
+      <p class="hint">Any proportion. Scaling a recipe up 1.5&times; is 2 : 3;
+        a 1:24,000 map is 1 : 24000; a gear set is 3 : 5. Fractions work
+        everywhere &mdash; "1/2 : 3/4".</p>
+      <label for="ratio-from" style="margin-top:14px">From</label>
+      <input type="text" id="ratio-from" placeholder="value or 1 1/2"
+             autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="swap">&darr;&uarr;</div>
+      <label for="ratio-to">To</label>
+      <input type="text" id="ratio-to" placeholder="value" autocomplete="off"
+             autocapitalize="off" spellcheck="false">
+      <p class="big" id="ratio-result"></p>
+      <p class="sub" id="ratio-factor"></p>
     </div>
   </section>
 
@@ -100,15 +126,15 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
       <label for="scale-sel">Scale</label>
       <div class="row" style="margin-top:0">
         <select id="scale-sel" style="flex:1;max-width:none" aria-label="Scale"></select>
-        <input type="number" id="scale-custom" class="hide" inputmode="decimal"
-               min="0" step="any" placeholder="87" style="width:110px"
+        <input type="text" id="scale-custom" class="hide" autocomplete="off"
+               placeholder="87" style="width:110px"
                aria-label="Custom scale denominator">
       </div>
       <p class="hint" id="scale-note"></p>
       <label for="real-val" style="margin-top:14px">Real-world size</label>
       <div class="row" style="margin-top:0">
-        <input type="number" id="real-val" inputmode="decimal" min="0" step="any"
-               placeholder="e.g. 6">
+        <input type="text" id="real-val" autocomplete="off" autocapitalize="off"
+               spellcheck="false" placeholder="e.g. 6 or 6 1/2">
         <select id="real-unit" aria-label="Real-world unit">
           <option value="ft">ft</option><option value="in">in</option>
           <option value="m">m</option><option value="cm">cm</option>
@@ -118,8 +144,8 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
       <div class="swap">&darr;&uarr;</div>
       <label for="model-val">Model size</label>
       <div class="row" style="margin-top:0">
-        <input type="number" id="model-val" inputmode="decimal" min="0" step="any"
-               placeholder="e.g. 21">
+        <input type="text" id="model-val" autocomplete="off" autocapitalize="off"
+               spellcheck="false" placeholder="e.g. 21">
         <select id="model-unit" aria-label="Model unit">
           <option value="mm">mm</option><option value="in">in</option>
           <option value="cm">cm</option>
@@ -135,7 +161,7 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
         this works out the ratio.</p>
       <label for="ws-real">Real size</label>
       <div class="row" style="margin-top:0">
-        <input type="number" id="ws-real" inputmode="decimal" min="0" step="any">
+        <input type="text" id="ws-real" autocomplete="off" autocapitalize="off" spellcheck="false">
         <select id="ws-real-unit">
           <option value="ft">ft</option><option value="in">in</option>
           <option value="m">m</option><option value="cm">cm</option>
@@ -144,7 +170,7 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
       </div>
       <label for="ws-model">Model size</label>
       <div class="row" style="margin-top:0">
-        <input type="number" id="ws-model" inputmode="decimal" min="0" step="any">
+        <input type="text" id="ws-model" autocomplete="off" autocapitalize="off" spellcheck="false">
         <select id="ws-model-unit">
           <option value="mm">mm</option><option value="in">in</option>
           <option value="cm">cm</option>
@@ -156,7 +182,7 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
   </section>
 
   <p class="foot">Everything runs on this device — no network needed after the
-    first load. <span style="opacity:.6">v2</span></p>
+    first load. <span style="opacity:.6">v3</span></p>
 </main>
 
 <script>
@@ -193,7 +219,22 @@ const CATS = {
     "sq km": 1e6, "sq mi": 2589988.110336,
   }, def: ["sq ft", "sq m"] },
 };
+const RATIO_CAT = "Ratio";
 const SCALE_CAT = "Model scale";
+
+/* Accept fractions anywhere a number is typed: "3/4", "1 1/2", "1-1/2",
+   plus plain decimals. */
+function parseVal(s){
+  s = String(s ?? "").trim();
+  if (!s) return NaN;
+  const m = s.match(/^(?:(-?\d+(?:\.\d+)?)[ -]+)?(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  if (m){
+    const whole = m[1] !== undefined ? parseFloat(m[1]) : 0;
+    const frac = parseFloat(m[2]) / parseFloat(m[3]);
+    return whole < 0 ? whole - frac : whole + frac;
+  }
+  return parseFloat(s);
+}
 
 const KEY = "unitconv:v1";
 let state = { cat: "Length", units: {}, lastEdited: "from",
@@ -214,7 +255,7 @@ function fmt(n, digits = 4){
 function buildChips(){
   const box = $("cat-chips");
   box.innerHTML = "";
-  for (const name of [...Object.keys(CATS), SCALE_CAT]){
+  for (const name of [...Object.keys(CATS), RATIO_CAT, SCALE_CAT]){
     const b = document.createElement("button");
     b.className = "chip" + (state.cat === name ? " on" : "");
     b.textContent = name;
@@ -225,11 +266,40 @@ function buildChips(){
 
 function render(){
   buildChips();
-  const scale = state.cat === SCALE_CAT;
-  $("v-units").classList.toggle("hide", scale);
-  $("v-scale").classList.toggle("hide", !scale);
-  if (scale){ buildPicker(); recalcScale(); }
+  const mode = state.cat === SCALE_CAT ? "scale"
+             : state.cat === RATIO_CAT ? "ratio" : "units";
+  $("v-units").classList.toggle("hide", mode !== "units");
+  $("v-ratio").classList.toggle("hide", mode !== "ratio");
+  $("v-scale").classList.toggle("hide", mode !== "scale");
+  if (mode === "scale"){ buildPicker(); recalcScale(); }
+  else if (mode === "ratio"){
+    if (state.ratioA !== undefined) $("ratio-a").value = state.ratioA;
+    if (state.ratioB !== undefined) $("ratio-b").value = state.ratioB;
+    recalcRatio();
+  }
   else { buildUnitSelects(); recalcUnits(); }
+}
+
+/* ---------- custom ratio ---------- */
+function recalcRatio(){
+  state.ratioA = $("ratio-a").value; state.ratioB = $("ratio-b").value; save();
+  const a = parseVal(state.ratioA), b = parseVal(state.ratioB);
+  const out = $("ratio-result"), fac = $("ratio-factor");
+  if (!(a > 0) || !(b > 0)){ out.textContent = ""; fac.textContent = ""; return; }
+  const fromSide = state.ratioEdited !== "to";
+  const src = fromSide ? $("ratio-from") : $("ratio-to");
+  const dst = fromSide ? $("ratio-to") : $("ratio-from");
+  const v = parseVal(src.value);
+  if (src.value.trim() === "" || !isFinite(v)){
+    dst.value = ""; out.textContent = "";
+    fac.textContent = `× ${fmt(b / a)} going down, × ${fmt(a / b)} coming back`;
+    return;
+  }
+  const res = fromSide ? (v * b) / a : (v * a) / b;
+  dst.value = fmt(res);
+  const f = fromSide ? v : res, t = fromSide ? res : v;
+  out.textContent = `${fmt(f)} → ${fmt(t)}`;
+  fac.textContent = `at ${state.ratioA} : ${state.ratioB} (× ${fmt(b / a)})`;
 }
 
 /* ---------- generic unit conversion ---------- */
@@ -262,8 +332,8 @@ function recalcUnits(){
   const src = state.lastEdited === "from" ? $("from-val") : $("to-val");
   const dst = state.lastEdited === "from" ? $("to-val") : $("from-val");
   const out = $("u-result"), all = $("u-all");
-  const v = parseFloat(src.value);
-  if (src.value === "" || !isFinite(v)){
+  const v = parseVal(src.value);
+  if (src.value.trim() === "" || !isFinite(v)){
     dst.value = ""; out.textContent = ""; all.innerHTML = ""; return;
   }
   const a = state.lastEdited === "from" ? from : to;
@@ -299,7 +369,7 @@ const TO_MM = { mm: 1, cm: 10, m: 1000, in: 25.4, ft: 304.8 };
 
 function denom(){
   if (state.custom){
-    const v = parseFloat($("scale-custom").value);
+    const v = parseVal($("scale-custom").value);
     return v > 0 ? v : null;
   }
   return state.denom;
@@ -353,14 +423,14 @@ function recalcScale(){
   const out = $("result"), alt = $("result-alt");
   if (!d){ out.textContent = ""; alt.textContent = ""; return; }
   if (state.scaleEdited !== "model"){
-    const v = parseFloat(rEl.value);
+    const v = parseVal(rEl.value);
     if (!(v >= 0) || rEl.value === ""){ out.textContent = ""; alt.textContent = ""; return; }
     const modelMm = (v * TO_MM[rUnit]) / d;
     mEl.value = fmtS(modelMm / TO_MM[mUnit], 3);
     out.textContent = fmtS(modelMm / TO_MM[mUnit], 2) + " " + mUnit + " on the model";
     alt.textContent = `= ${fmtS(modelMm, 1)} mm · ${fracIn(modelMm / 25.4)}`;
   } else {
-    const v = parseFloat(mEl.value);
+    const v = parseVal(mEl.value);
     if (!(v >= 0) || mEl.value === ""){ out.textContent = ""; alt.textContent = ""; return; }
     const realMm = v * TO_MM[mUnit] * d;
     rEl.value = fmtS(realMm / TO_MM[rUnit], 3);
@@ -369,7 +439,7 @@ function recalcScale(){
   }
 }
 function recalcWhatScale(){
-  const r = parseFloat($("ws-real").value), m = parseFloat($("ws-model").value);
+  const r = parseVal($("ws-real").value), m = parseVal($("ws-model").value);
   const out = $("ws-result"), near = $("ws-nearest");
   if (!(r > 0) || !(m > 0)){ out.textContent = ""; near.textContent = ""; return; }
   const ratio = (r * TO_MM[$("ws-real-unit").value]) / (m * TO_MM[$("ws-model-unit").value]);
@@ -390,6 +460,11 @@ $("from-val").addEventListener("input", () => { state.lastEdited = "from"; recal
 $("to-val").addEventListener("input", () => { state.lastEdited = "to"; recalcUnits(); });
 $("from-unit").addEventListener("change", recalcUnits);
 $("to-unit").addEventListener("change", recalcUnits);
+
+$("ratio-a").addEventListener("input", recalcRatio);
+$("ratio-b").addEventListener("input", recalcRatio);
+$("ratio-from").addEventListener("input", () => { state.ratioEdited = "from"; recalcRatio(); });
+$("ratio-to").addEventListener("input", () => { state.ratioEdited = "to"; recalcRatio(); });
 
 $("scale-sel").addEventListener("change", () => {
   const v = $("scale-sel").value;
