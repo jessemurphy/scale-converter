@@ -2,25 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Unit Converter</title>
+<title>Scale Converter</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Convert">
+<meta name="apple-mobile-web-app-title" content="Scale">
 <meta name="theme-color" content="#3a5a80">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <style>
 :root{
-  --bg:#f6f7f4; --card:#ffffff; --ink:#1b1d21; --muted:#71757e;
+  --bg:#f0efe9; --card:#ffffff; --ink:#1b1d21; --muted:#71757e;
   --rule:#dfe2da; --accent:#3a5a80; --accent-ink:#ffffff; --wash:#edefe9;
-  --gold:#b08434;
+  --gold:#b08434; --banner:#22252b; --banner-ink:#f2f1ec;
+  --mono:ui-monospace,"SF Mono","IBM Plex Mono",Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#14161a; --card:#1e2127; --ink:#e8eaed; --muted:#9a9fa8;
     --rule:#33373f; --accent:#7ea4cf; --accent-ink:#101820; --wash:#181b20;
-    --gold:#d3ad5b;
+    --gold:#d3ad5b; --banner:#090a0c; --banner-ink:#e8eaed;
   }
 }
 *{box-sizing:border-box}
@@ -29,99 +30,140 @@ body{background:var(--bg);color:var(--ink);
   font:17px/1.5 -apple-system,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   padding-bottom:env(safe-area-inset-bottom)}
 main{max-width:560px;margin:0 auto;padding:14px 16px 60px}
-header.top{display:flex;align-items:baseline;gap:10px;padding:4px 0 10px;
-  border-bottom:1px solid var(--rule);margin-bottom:14px}
-.brand{font-size:20px;font-weight:800;letter-spacing:-.01em}
-.tagline{color:var(--muted);font-size:12.5px}
-h2{font-size:14px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.09em;color:var(--muted);margin:26px 0 10px}
-.card{background:var(--card);border:1px solid var(--rule);border-radius:16px;
-  padding:16px}
-.row{display:flex;gap:8px;margin:10px 0;align-items:center}
-input,select{font:inherit;color:var(--ink);background:var(--card);
-  border:1px solid var(--rule);border-radius:10px;padding:11px 12px}
-input[type=number],input[type=text]{width:100%;font-variant-numeric:tabular-nums}
-select{flex-shrink:0;max-width:46%}
+h1{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:8px 0 2px}
+.sub-h{color:var(--muted);font-size:15px;margin:0 0 14px}
 label{font-size:13px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.07em;color:var(--muted);display:block;margin:0 0 6px}
-.swap{display:flex;justify-content:center;margin:2px 0;color:var(--muted);
-  font-size:18px}
-.big{font-size:24px;font-weight:800;margin:6px 0 0;
-  font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  letter-spacing:.09em;color:var(--muted);display:flex;align-items:center;
+  gap:7px;margin:0 0 10px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--gold);
+  display:none}
+label.active .dot{display:inline-block}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:18px;
+  padding:18px;margin:0 0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.row{display:flex;gap:10px;align-items:center}
+input,select{font:inherit;color:var(--ink);background:var(--bg);
+  border:1px solid var(--rule);border-radius:12px;padding:13px 14px}
+input{width:100%;font-family:var(--mono);font-size:22px;font-weight:600;
+  text-align:center}
+select{flex-shrink:0;font-weight:600}
+.colon{font-family:var(--mono);font-size:22px;color:var(--muted);
+  font-weight:700}
+.chips{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 0}
+.chips.toprow{margin:0 0 14px}
+.chip{font-family:var(--mono);font-size:15px;padding:9px 15px;cursor:pointer;
+  border:1px solid var(--rule);background:var(--card);color:var(--ink);
+  border-radius:999px;font-weight:600}
+.chip.on{background:var(--banner);border-color:var(--banner);
+  color:var(--banner-ink)}
+.chip.cat{font-family:inherit;font-size:13.5px;color:var(--muted)}
+.chip.cat.on{background:var(--banner);color:var(--banner-ink)}
+.banner{background:var(--banner);color:var(--banner-ink);border-radius:16px;
+  padding:17px 18px;font-family:var(--mono);font-size:16.5px;line-height:1.5;
+  overflow-wrap:anywhere;margin:0 0 14px}
+.big{font-size:24px;font-weight:800;margin:6px 0 0;font-family:var(--mono);
+  overflow-wrap:anywhere}
 .sub{color:var(--muted);font-size:14px;margin:2px 0 0;
   font-variant-numeric:tabular-nums}
 .hint{color:var(--muted);font-size:13.5px;line-height:1.55}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
-.chip{font:inherit;font-size:13.5px;padding:7px 12px;cursor:pointer;
-  border:1px solid var(--rule);background:var(--card);color:var(--muted);
-  border-radius:10px;font-weight:600}
-.chip.on{color:var(--accent);border-color:var(--accent);font-weight:700}
 .all{margin:14px 0 0;border-top:1px solid var(--rule);padding-top:8px}
 .all-row{display:flex;justify-content:space-between;gap:12px;padding:5px 2px;
   font-size:15px;font-variant-numeric:tabular-nums}
 .all-row .u{color:var(--muted)}
 .scalename{color:var(--gold);font-weight:700}
-.foot{margin-top:36px;padding-top:12px;border-top:1px solid var(--rule);
-  color:var(--muted);font-size:12.5px;line-height:1.6}
+h2{font-size:14px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--muted);margin:24px 0 10px}
+.foot{margin-top:28px;color:var(--muted);font-size:13px;line-height:1.6;
+  text-align:center}
 .hide{display:none}
 </style>
 </head>
 <body>
 <main>
-  <header class="top"><span class="brand">Convert</span>
-    <span class="tagline">any unit to any unit</span></header>
+  <h1 id="page-title">Scale Converter</h1>
+  <p class="sub-h" id="page-sub">Enter either length — the other side calculates
+    automatically.</p>
 
-  <div class="chips" id="cat-chips"></div>
-  <div class="chips" id="disp-chips" style="margin-top:-6px">
-    <button class="chip" data-d="dec" onclick="setDisp('dec')">0.75</button>
-    <button class="chip" data-d="frac" onclick="setDisp('frac')">3/4</button>
+  <div class="chips toprow" id="cat-chips"></div>
+  <div class="chips toprow" id="disp-chips" style="margin-top:-6px">
+    <button class="chip cat" data-d="dec" onclick="setDisp('dec')">0.75</button>
+    <button class="chip cat" data-d="frac" onclick="setDisp('frac')">3/4</button>
     <span class="hint" style="align-self:center">result style</span>
   </div>
 
-  <!-- ============ units ============ -->
-  <section id="v-units">
+  <!-- ============ scale calculator (default) ============ -->
+  <section id="v-scalecalc">
     <div class="card">
-      <label for="from-val">From</label>
-      <div class="row" style="margin-top:0">
-        <input type="text" id="from-val" autocomplete="off" autocapitalize="off"
-               spellcheck="false" placeholder="value or 1 1/2">
-        <select id="from-unit" aria-label="From unit"></select>
+      <label>Scale ratio</label>
+      <div class="row">
+        <input type="text" id="sc-a" value="1" autocomplete="off"
+               autocapitalize="off" spellcheck="false" aria-label="Scale side">
+        <span class="colon">:</span>
+        <input type="text" id="sc-b" value="100" autocomplete="off"
+               autocapitalize="off" spellcheck="false" aria-label="Actual side">
       </div>
-      <div class="swap">&darr;&uarr;</div>
-      <label for="to-val">To</label>
-      <div class="row" style="margin-top:0">
-        <input type="text" id="to-val" autocomplete="off" autocapitalize="off"
-               spellcheck="false" placeholder="value or 3/4">
-        <select id="to-unit" aria-label="To unit"></select>
+      <div class="chips" id="sc-presets"></div>
+    </div>
+
+    <div class="card">
+      <label id="sc-actual-label"><span class="dot"></span>Actual length</label>
+      <div class="row">
+        <input type="text" id="sc-actual" placeholder="0" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+        <select id="sc-actual-unit" aria-label="Actual unit"></select>
       </div>
-      <p class="big" id="u-result"></p>
-      <div class="all" id="u-all"></div>
+    </div>
+
+    <div class="card">
+      <label id="sc-scale-label"><span class="dot"></span>Scale length</label>
+      <div class="row">
+        <input type="text" id="sc-scale" placeholder="0" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+        <select id="sc-scale-unit" aria-label="Scale unit"></select>
+      </div>
+    </div>
+
+    <div class="banner" id="sc-banner">Enter a length to see the math.</div>
+
+    <h2>What scale is it?</h2>
+    <div class="card">
+      <p class="hint" style="margin-top:0">Measure the real thing and the model —
+        this works out the ratio.</p>
+      <div class="row">
+        <input type="text" id="ws-real" placeholder="real" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+        <select id="ws-real-unit"></select>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input type="text" id="ws-model" placeholder="model" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+        <select id="ws-model-unit"></select>
+      </div>
+      <p class="big" id="ws-result"></p>
+      <p class="sub" id="ws-nearest"></p>
     </div>
   </section>
 
-  <!-- ============ custom ratio ============ -->
+  <!-- ============ unitless ratio ============ -->
   <section id="v-ratio" class="hide">
     <div class="card">
       <label for="ratio-preset">Preset</label>
-      <div class="row" style="margin-top:0">
+      <div class="row">
         <select id="ratio-preset" style="flex:1;max-width:none"></select>
       </div>
       <label style="margin-top:14px">Ratio &mdash; from : to</label>
-      <div class="row" style="margin-top:0">
+      <div class="row">
         <input type="text" id="ratio-a" placeholder="2" autocomplete="off"
                autocapitalize="off" spellcheck="false">
-        <span style="color:var(--muted);font-weight:800">:</span>
+        <span class="colon">:</span>
         <input type="text" id="ratio-b" placeholder="3" autocomplete="off"
                autocapitalize="off" spellcheck="false">
       </div>
-      <p class="hint">Any proportion. Scaling a recipe up 1.5&times; is 2 : 3;
-        a 1:24,000 map is 1 : 24000; a gear set is 3 : 5. Fractions work
-        everywhere &mdash; "1/2 : 3/4".</p>
+      <p class="hint">Any proportion, no units. Recipe up 1.5&times; is 2 : 3;
+        a gear set is 3 : 5. Fractions work &mdash; "1/2 : 3/4".</p>
       <label for="ratio-from" style="margin-top:14px">From</label>
       <input type="text" id="ratio-from" placeholder="value or 1 1/2"
              autocomplete="off" autocapitalize="off" spellcheck="false">
-      <div class="swap">&darr;&uarr;</div>
-      <label for="ratio-to">To</label>
+      <label for="ratio-to" style="margin-top:10px">To</label>
       <input type="text" id="ratio-to" placeholder="value" autocomplete="off"
              autocapitalize="off" spellcheck="false">
       <p class="big" id="ratio-result"></p>
@@ -129,81 +171,81 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
     </div>
   </section>
 
-  <!-- ============ model scale (kept as one more category) ============ -->
-  <section id="v-scale" class="hide">
+  <!-- ============ unit categories ============ -->
+  <section id="v-units" class="hide">
     <div class="card">
-      <label for="scale-sel">Scale</label>
-      <div class="row" style="margin-top:0">
-        <select id="scale-sel" style="flex:1;max-width:none" aria-label="Scale"></select>
-        <input type="text" id="scale-custom" class="hide" autocomplete="off"
-               placeholder="87" style="width:110px"
-               aria-label="Custom scale denominator">
+      <label for="from-val">From</label>
+      <div class="row">
+        <input type="text" id="from-val" autocomplete="off" autocapitalize="off"
+               spellcheck="false" placeholder="value or 1 1/2" style="text-align:left">
+        <select id="from-unit" aria-label="From unit"></select>
       </div>
-      <p class="hint" id="scale-note"></p>
-      <label for="real-val" style="margin-top:14px">Real-world size</label>
-      <div class="row" style="margin-top:0">
-        <input type="text" id="real-val" autocomplete="off" autocapitalize="off"
-               spellcheck="false" placeholder="e.g. 6 or 6 1/2">
-        <select id="real-unit" aria-label="Real-world unit">
-          <option value="ft">ft</option><option value="in">in</option>
-          <option value="m">m</option><option value="cm">cm</option>
-          <option value="mm">mm</option>
-        </select>
+      <label for="to-val" style="margin-top:14px">To</label>
+      <div class="row">
+        <input type="text" id="to-val" autocomplete="off" autocapitalize="off"
+               spellcheck="false" placeholder="value or 3/4" style="text-align:left">
+        <select id="to-unit" aria-label="To unit"></select>
       </div>
-      <div class="swap">&darr;&uarr;</div>
-      <label for="model-val">Model size</label>
-      <div class="row" style="margin-top:0">
-        <input type="text" id="model-val" autocomplete="off" autocapitalize="off"
-               spellcheck="false" placeholder="e.g. 21">
-        <select id="model-unit" aria-label="Model unit">
-          <option value="mm">mm</option><option value="in">in</option>
-          <option value="cm">cm</option>
-        </select>
-      </div>
-      <p class="big" id="result"></p>
-      <p class="sub" id="result-alt"></p>
-    </div>
-
-    <h2>What scale is it?</h2>
-    <div class="card">
-      <p class="hint" style="margin-top:0">Measure the real thing and the model —
-        this works out the ratio.</p>
-      <label for="ws-real">Real size</label>
-      <div class="row" style="margin-top:0">
-        <input type="text" id="ws-real" autocomplete="off" autocapitalize="off" spellcheck="false">
-        <select id="ws-real-unit">
-          <option value="ft">ft</option><option value="in">in</option>
-          <option value="m">m</option><option value="cm">cm</option>
-          <option value="mm">mm</option>
-        </select>
-      </div>
-      <label for="ws-model">Model size</label>
-      <div class="row" style="margin-top:0">
-        <input type="text" id="ws-model" autocomplete="off" autocapitalize="off" spellcheck="false">
-        <select id="ws-model-unit">
-          <option value="mm">mm</option><option value="in">in</option>
-          <option value="cm">cm</option>
-        </select>
-      </div>
-      <p class="big" id="ws-result"></p>
-      <p class="sub" id="ws-nearest"></p>
+      <p class="big" id="u-result"></p>
+      <div class="all" id="u-all"></div>
     </div>
   </section>
 
-  <p class="foot">Everything runs on this device — no network needed after the
-    first load. <span style="opacity:.6">v5</span></p>
+  <p class="foot">Works offline &middot; mm, cm, m, km, in, ft, yd, mi, nmi<br>
+    Add to Home Screen in Safari for an app-like experience.
+    <span style="opacity:.6">v6</span></p>
 </main>
 
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
 
-/* ---------- unit categories: factor = size of one unit in the base unit.
-   Temperature is affine, handled by functions instead. ---------- */
+/* ---------- shared parsing / formatting ---------- */
+function parseVal(s){
+  s = String(s ?? "").trim();
+  if (!s) return NaN;
+  const m = s.match(/^(?:(-?\d+(?:\.\d+)?)[ -]+)?(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  if (m){
+    const whole = m[1] !== undefined ? parseFloat(m[1]) : 0;
+    const frac = parseFloat(m[2]) / parseFloat(m[3]);
+    return whole < 0 ? whole - frac : whole + frac;
+  }
+  return parseFloat(s);
+}
+function fmt(n){
+  if (!isFinite(n)) return "—";
+  if (n !== 0 && Math.abs(n) < 1e-6) return n.toExponential(3);
+  const r = Math.abs(n) >= 1000 ? n.toFixed(2) : n.toPrecision(6);
+  const s = String(parseFloat(r));
+  return Math.abs(n) >= 1000 ? parseFloat(s).toLocaleString(undefined, {maximumFractionDigits: 2}) : s;
+}
+function toFrac(n){
+  if (!isFinite(n)) return "—";
+  const sign = n < 0 ? "-" : "";
+  const a = Math.abs(n);
+  const whole = Math.floor(a);
+  const frac = a - whole;
+  if (frac < 1e-9) return sign + whole;
+  let bN = 0, bD = 1, bErr = frac;
+  for (const d of [2, 3, 4, 5, 6, 8, 10, 12, 16, 32, 64]){
+    const num = Math.round(frac * d);
+    const err = Math.abs(frac - num / d);
+    if (err < bErr - 1e-12){ bErr = err; bN = num; bD = d; }
+  }
+  if (bErr > 0.002) return fmt(n);
+  if (bN === bD) return sign + (whole + 1);
+  if (bN === 0) return sign + whole;
+  const g = (x, y) => y ? g(y, x % y) : x;
+  const c = g(bN, bD);
+  const approx = bErr > 1e-6 ? "≈ " : "";
+  return approx + sign + (whole ? whole + " " : "") + (bN / c) + "/" + (bD / c);
+}
+
+/* ---------- categories ---------- */
 const CATS = {
   Length: { units: {
     mm: 0.001, cm: 0.01, m: 1, km: 1000,
-    in: 0.0254, ft: 0.3048, yd: 0.9144, mi: 1609.344,
+    in: 0.0254, ft: 0.3048, yd: 0.9144, mi: 1609.344, nmi: 1852,
   }, def: ["ft", "m"] },
   Weight: { units: {
     g: 0.001, kg: 1, oz: 0.0283495, lb: 0.45359237,
@@ -228,87 +270,45 @@ const CATS = {
     "sq km": 1e6, "sq mi": 2589988.110336,
   }, def: ["sq ft", "sq m"] },
 };
+const SCALECALC_CAT = "Scale";
 const RATIO_CAT = "Ratio";
-const SCALE_CAT = "Model scale";
+const LEN_UNITS = ["mm", "cm", "m", "km", "in", "ft", "yd", "mi", "nmi"];
+const TO_M = CATS.Length.units;
 
-/* Accept fractions anywhere a number is typed: "3/4", "1 1/2", "1-1/2",
-   plus plain decimals. */
-function parseVal(s){
-  s = String(s ?? "").trim();
-  if (!s) return NaN;
-  const m = s.match(/^(?:(-?\d+(?:\.\d+)?)[ -]+)?(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
-  if (m){
-    const whole = m[1] !== undefined ? parseFloat(m[1]) : 0;
-    const frac = parseFloat(m[2]) / parseFloat(m[3]);
-    return whole < 0 ? whole - frac : whole + frac;
-  }
-  return parseFloat(s);
-}
+const SC_PRESETS = [12, 24, 35, 48, 50, 64, 72, 87, 100, 160, 200, 500];
+const NAMED = {12: "dollhouse", 24: "½″ dollhouse", 35: "military", 48: "O scale",
+  64: "S · Hot Wheels", 72: "aircraft", 76: "OO", 87: "HO", 160: "N", 220: "Z"};
 
-/* Preloaded ratios for the Ratio tab. [label, from, to] */
 const RATIO_PRESETS = [
   ["Double it (1 : 2)", "1", "2"],
   ["Halve it (2 : 1)", "2", "1"],
-  ["Recipe \u00d71.5 (2 : 3)", "2", "3"],
-  ["Recipe \u00d73/4 (4 : 3)", "4", "3"],
-  ["Recipe \u00d72/3 (3 : 2)", "3", "2"],
-  ["Recipe \u00d71/3 (3 : 1)", "3", "1"],
-  ["USGS topo map (1 : 24,000)", "1", "24000"],
-  ["Map 1 : 100,000", "1", "100000"],
+  ["Recipe ×1.5 (2 : 3)", "2", "3"],
+  ["Recipe ×3/4 (4 : 3)", "4", "3"],
+  ["Recipe ×2/3 (3 : 2)", "3", "2"],
+  ["Recipe ×1/3 (3 : 1)", "3", "1"],
   ["Golden ratio (1 : 1.618)", "1", "1.618"],
   ["16:9 screen", "16", "9"],
   ["4:3 screen", "4", "3"],
   ["3:2 photo", "3", "2"],
-  ["A-series paper (1 : \u221a2)", "1", "1.41421356"],
+  ["A-series paper (1 : √2)", "1", "1.41421356"],
 ];
 
-const KEY = "unitconv:v1";
-let state = { cat: "Length", units: {}, lastEdited: "from",
-              denom: 87, custom: false, disp: "dec" };
+const KEY = "unitconv:v2";
+let state = { cat: SCALECALC_CAT, units: {}, lastEdited: "from", disp: "dec",
+              scA: "1", scB: "100", scActualUnit: "m", scScaleUnit: "cm",
+              scSide: "actual" };
 try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch {}
-if (!CATS[state.cat] && state.cat !== SCALE_CAT) state.cat = "Length";
+if (!CATS[state.cat] && state.cat !== SCALECALC_CAT && state.cat !== RATIO_CAT)
+  state.cat = SCALECALC_CAT;
 const save = () => localStorage.setItem(KEY, JSON.stringify(state));
 
-function fmt(n, digits = 4){
-  if (!isFinite(n)) return "—";
-  if (n !== 0 && Math.abs(n) < 1e-6) return n.toExponential(3);
-  const r = Math.abs(n) >= 1000 ? n.toFixed(2) : n.toPrecision(6);
-  const s = String(parseFloat(r));
-  return Math.abs(n) >= 1000 ? parseFloat(s).toLocaleString(undefined, {maximumFractionDigits: 2}) : s;
-}
-
-/* Nearest fraction (denominators to 64). Falls back to the decimal when
-   no small fraction is close; prefixes \u2248 when it's near but not exact. */
-function toFrac(n){
-  if (!isFinite(n)) return "\u2014";
-  const sign = n < 0 ? "-" : "";
-  const a = Math.abs(n);
-  const whole = Math.floor(a);
-  const frac = a - whole;
-  if (frac < 1e-9) return sign + whole;
-  let bN = 0, bD = 1, bErr = frac;
-  // Only denominators people actually use — searching every d up to 64
-  // "finds" absurdities like 2/51 for what is really just a decimal.
-  for (const d of [2, 3, 4, 5, 6, 8, 10, 12, 16, 32, 64]){
-    const num = Math.round(frac * d);
-    const err = Math.abs(frac - num / d);
-    if (err < bErr - 1e-12){ bErr = err; bN = num; bD = d; }
-  }
-  if (bErr > 0.002) return fmt(n);        // not meaningfully a fraction
-  if (bN === bD) return sign + (whole + 1);
-  if (bN === 0) return sign + whole;
-  let g = (x, y) => y ? g(y, x % y) : x;
-  const c = g(bN, bD);
-  const approx = bErr > 1e-6 ? "\u2248 " : "";
-  return approx + sign + (whole ? whole + " " : "") + (bN / c) + "/" + (bD / c);
-}
 function fmtOut(n){ return state.disp === "frac" ? toFrac(n) : fmt(n); }
-/* The display toggle also drives the phone keyboard: decimal mode gets
-   the numeric pad, fraction mode the full keyboard (for "/"). Temperature
-   keeps the full keyboard either way — the iOS decimal pad has no minus
-   key and temperatures go negative. */
-const VAL_INPUTS = ["from-val", "to-val", "ratio-a", "ratio-b", "ratio-from",
-  "ratio-to", "scale-custom", "real-val", "model-val", "ws-real", "ws-model"];
+
+/* keyboard follows the display mode; Temperature keeps the full keyboard
+   (the iOS decimal pad has no minus key) */
+const VAL_INPUTS = ["sc-a", "sc-b", "sc-actual", "sc-scale", "ws-real",
+  "ws-model", "ratio-a", "ratio-b", "ratio-from", "ratio-to",
+  "from-val", "to-val"];
 function applyInputMode(){
   const dec = (state.disp || "dec") === "dec";
   for (const id of VAL_INPUTS){
@@ -321,39 +321,42 @@ function applyInputMode(){
 }
 function setDisp(d){
   state.disp = d; save();
-  markDisp();
-  applyInputMode();
-  if (state.cat === RATIO_CAT) recalcRatio(); else if (state.cat !== SCALE_CAT) recalcUnits();
+  markDisp(); applyInputMode();
+  if (state.cat === SCALECALC_CAT) recalcSc();
+  else if (state.cat === RATIO_CAT) recalcRatio();
+  else recalcUnits();
 }
 function markDisp(){
   document.querySelectorAll("#disp-chips .chip").forEach(b =>
     b.classList.toggle("on", (state.disp || "dec") === b.dataset.d));
 }
 
-/* ---------- category chips ---------- */
+/* ---------- chrome ---------- */
 function buildChips(){
   const box = $("cat-chips");
   box.innerHTML = "";
-  for (const name of [...Object.keys(CATS), RATIO_CAT, SCALE_CAT]){
+  for (const name of [SCALECALC_CAT, RATIO_CAT, ...Object.keys(CATS)]){
     const b = document.createElement("button");
-    b.className = "chip" + (state.cat === name ? " on" : "");
+    b.className = "chip cat" + (state.cat === name ? " on" : "");
     b.textContent = name;
     b.onclick = () => { state.cat = name; save(); render(); };
     box.appendChild(b);
   }
 }
-
 function render(){
-  buildChips();
-  const mode = state.cat === SCALE_CAT ? "scale"
+  buildChips(); markDisp(); applyInputMode();
+  const mode = state.cat === SCALECALC_CAT ? "sc"
              : state.cat === RATIO_CAT ? "ratio" : "units";
-  $("v-units").classList.toggle("hide", mode !== "units");
+  $("v-scalecalc").classList.toggle("hide", mode !== "sc");
   $("v-ratio").classList.toggle("hide", mode !== "ratio");
-  $("v-scale").classList.toggle("hide", mode !== "scale");
-  $("disp-chips").classList.toggle("hide", mode === "scale");
-  markDisp();
-  applyInputMode();
-  if (mode === "scale"){ buildPicker(); recalcScale(); }
+  $("v-units").classList.toggle("hide", mode !== "units");
+  $("page-title").textContent = mode === "sc" ? "Scale Converter"
+    : mode === "ratio" ? "Ratio" : state.cat;
+  $("page-sub").textContent = mode === "sc"
+    ? "Enter either length — the other side calculates automatically."
+    : mode === "ratio" ? "Any proportion, both directions."
+    : "Enter either value — the other side calculates automatically.";
+  if (mode === "sc") initSc();
   else if (mode === "ratio"){
     buildRatioPresets();
     if (state.ratioA !== undefined) $("ratio-a").value = state.ratioA;
@@ -363,12 +366,106 @@ function render(){
   else { buildUnitSelects(); recalcUnits(); }
 }
 
-/* ---------- custom ratio ---------- */
+/* ================= scale calculator ================= */
+function buildLenSelect(sel, chosen){
+  const el = $(sel);
+  if (!el.options.length)
+    for (const u of LEN_UNITS){
+      const o = document.createElement("option");
+      o.value = u; o.textContent = u;
+      el.appendChild(o);
+    }
+  el.value = chosen;
+}
+function initSc(){
+  $("sc-a").value = state.scA; $("sc-b").value = state.scB;
+  buildLenSelect("sc-actual-unit", state.scActualUnit);
+  buildLenSelect("sc-scale-unit", state.scScaleUnit);
+  buildLenSelect("ws-real-unit", state.wsRealUnit || "ft");
+  buildLenSelect("ws-model-unit", state.wsModelUnit || "mm");
+  buildScPresets();
+  recalcSc();
+}
+function buildScPresets(){
+  const box = $("sc-presets");
+  box.innerHTML = "";
+  const a = parseVal($("sc-a").value), b = parseVal($("sc-b").value);
+  for (const p of SC_PRESETS){
+    const btn = document.createElement("button");
+    btn.className = "chip" + (a === 1 && b === p ? " on" : "");
+    btn.textContent = "1:" + p;
+    if (NAMED[p]) btn.title = NAMED[p];
+    btn.onclick = () => {
+      state.scA = "1"; state.scB = String(p); save();
+      $("sc-a").value = "1"; $("sc-b").value = String(p);
+      buildScPresets(); recalcSc();
+    };
+    box.appendChild(btn);
+  }
+}
+function recalcSc(){
+  state.scA = $("sc-a").value; state.scB = $("sc-b").value;
+  state.scActualUnit = $("sc-actual-unit").value;
+  state.scScaleUnit = $("sc-scale-unit").value;
+  save();
+  const a = parseVal(state.scA), b = parseVal(state.scB);
+  const banner = $("sc-banner");
+  $("sc-actual-label").classList.toggle("active", state.scSide === "actual");
+  $("sc-scale-label").classList.toggle("active", state.scSide === "scale");
+  if (!(a > 0) || !(b > 0)){
+    banner.textContent = "Enter a valid ratio — both sides above zero.";
+    return;
+  }
+  const aU = state.scActualUnit, sU = state.scScaleUnit;
+  const fromActual = state.scSide !== "scale";
+  const src = fromActual ? $("sc-actual") : $("sc-scale");
+  const dst = fromActual ? $("sc-scale") : $("sc-actual");
+  const v = parseVal(src.value);
+  if (src.value.trim() === "" || !isFinite(v)){
+    dst.value = "";
+    banner.textContent = "Enter a length to see the math.";
+    return;
+  }
+  if (fromActual){
+    const res = (v * TO_M[aU] * a / b) / TO_M[sU];
+    dst.value = fmtOut(res);
+    const op = a === 1 ? `÷ ${fmt(b)}` : `× ${fmt(a)}/${fmt(b)}`;
+    banner.textContent =
+      `${fmtOut(v)} ${aU} ${op} = ${fmtOut(res)} ${sU}  (at ${fmt(a)} : ${fmt(b)})`;
+  } else {
+    const res = (v * TO_M[sU] * b / a) / TO_M[aU];
+    dst.value = fmtOut(res);
+    const op = a === 1 ? `× ${fmt(b)}` : `× ${fmt(b)}/${fmt(a)}`;
+    banner.textContent =
+      `${fmtOut(v)} ${sU} ${op} = ${fmtOut(res)} ${aU}  (at ${fmt(a)} : ${fmt(b)})`;
+  }
+}
+function recalcWhatScale(){
+  state.wsRealUnit = $("ws-real-unit").value;
+  state.wsModelUnit = $("ws-model-unit").value;
+  save();
+  const r = parseVal($("ws-real").value), m = parseVal($("ws-model").value);
+  const out = $("ws-result"), near = $("ws-nearest");
+  if (!(r > 0) || !(m > 0)){ out.textContent = ""; near.textContent = ""; return; }
+  const ratio = (r * TO_M[state.wsRealUnit]) / (m * TO_M[state.wsModelUnit]);
+  if (ratio < 1){ out.textContent = "Model is bigger than the real thing?"; near.textContent = ""; return; }
+  out.textContent = "1:" + fmt(ratio);
+  let best = null;
+  for (const d of [...SC_PRESETS, 76, 220]){
+    const err = Math.abs(d - ratio) / d;
+    if (!best || err < best.err) best = { d, err };
+  }
+  near.innerHTML = best && best.err <= 0.08
+    ? `Closest common scale: <span class="scalename">1:${best.d}${NAMED[best.d] ? " (" + NAMED[best.d] + ")" : ""}</span>`
+    : "Not close to any common scale.";
+}
+
+/* ================= unitless ratio ================= */
 function buildRatioPresets(){
   const sel = $("ratio-preset");
   if (sel.options.length) return;
   const ph = document.createElement("option");
-  ph.value = ""; ph.textContent = "Choose a preset\u2026";
+  ph.value = ""; ph.textContent = "Choose a preset…";
   sel.appendChild(ph);
   RATIO_PRESETS.forEach(([label], i) => {
     const o = document.createElement("option");
@@ -397,15 +494,12 @@ function recalcRatio(){
   fac.textContent = `at ${state.ratioA} : ${state.ratioB} (× ${fmt(b / a)})`;
 }
 
-/* ---------- generic unit conversion ---------- */
+/* ================= generic units ================= */
 function convert(cat, v, from, to){
   const c = CATS[cat];
-  if (c.affine){
-    return c.units[to].fromBase(c.units[from].toBase(v));
-  }
+  if (c.affine) return c.units[to].fromBase(c.units[from].toBase(v));
   return (v * c.units[from]) / c.units[to];
 }
-
 function buildUnitSelects(){
   const c = CATS[state.cat];
   const chosen = state.units[state.cat] || c.def;
@@ -420,9 +514,10 @@ function buildUnitSelects(){
     sel.value = c.units[chosen[idx]] !== undefined ? chosen[idx] : Object.keys(c.units)[0];
   }
 }
-
 function recalcUnits(){
-  const cat = state.cat, from = $("from-unit").value, to = $("to-unit").value;
+  const cat = state.cat;
+  if (!CATS[cat]) return;
+  const from = $("from-unit").value, to = $("to-unit").value;
   state.units[cat] = [from, to]; save();
   const src = state.lastEdited === "from" ? $("from-val") : $("to-val");
   const dst = state.lastEdited === "from" ? $("to-val") : $("from-val");
@@ -436,7 +531,6 @@ function recalcUnits(){
   const res = convert(cat, v, a, b);
   dst.value = fmtOut(res);
   out.textContent = `${fmtOut(v)} ${a} = ${fmtOut(res)} ${b}`;
-  // breakdown: the edited value in every unit of the category
   all.innerHTML = "";
   for (const u of Object.keys(CATS[cat].units)){
     if (u === a) continue;
@@ -447,114 +541,15 @@ function recalcUnits(){
   }
 }
 
-/* ================= model scale (unchanged behavior) ================= */
-const SCALES = [
-  [4, ""], [6, "action figures"], [8, ""], [10, ""],
-  [12, "1″ dollhouse"], [16, ""], [18, "diecast cars"],
-  [22.5, "G garden railway"], [24, "½″ dollhouse"],
-  [25, "model cars"], [32, "1 gauge · farm toys"],
-  [35, "military models"], [43, "diecast cars"],
-  [48, "O railway · aircraft"], [56, "28mm wargaming"],
-  [64, "S railway · Hot Wheels"], [72, "aircraft"],
-  [76, "OO railway"], [87, "HO railway"], [100, ""],
-  [144, "aircraft"], [160, "N railway"], [220, "Z railway"],
-  [285, "6mm wargaming"], [350, "ship models"], [700, "ship models"],
-];
-const TO_MM = { mm: 1, cm: 10, m: 1000, in: 25.4, ft: 304.8 };
-
-function denom(){
-  if (state.custom){
-    const v = parseVal($("scale-custom").value);
-    return v > 0 ? v : null;
-  }
-  return state.denom;
-}
-function fracIn(inches){
-  const whole = Math.floor(inches);
-  let num = Math.round((inches - whole) * 32), den = 32;
-  if (num === 32) return `${whole + 1}″`;
-  while (num % 2 === 0 && num > 0){ num /= 2; den /= 2; }
-  if (num === 0) return `${whole}″`;
-  return (whole ? whole + " " : "") + `${num}/${den}″`;
-}
-function fmtS(n, digits = 2){
-  if (!isFinite(n)) return "—";
-  return String(parseFloat(n.toFixed(digits)));
-}
-function fmtReal(mm){
-  if (mm >= 304.8){
-    const ft = Math.floor(mm / 304.8);
-    const inch = (mm - ft * 304.8) / 25.4;
-    return inch > 0.05 ? `${ft} ft ${fmtS(inch, 1)} in` : `${ft} ft`;
-  }
-  if (mm >= 25.4) return fmtS(mm / 25.4, 2) + " in";
-  return fmtS(mm, 1) + " mm";
-}
-function buildPicker(){
-  const sel = $("scale-sel");
-  sel.innerHTML = "";
-  for (const [d, label] of SCALES){
-    const o = document.createElement("option");
-    o.value = d;
-    o.textContent = "1:" + d + (label ? " — " + label : "");
-    sel.appendChild(o);
-  }
-  const custom = document.createElement("option");
-  custom.value = "custom";
-  custom.textContent = "Custom…";
-  sel.appendChild(custom);
-  sel.value = state.custom ? "custom" : String(state.denom);
-  $("scale-custom").classList.toggle("hide", !state.custom);
-  if (state.custom && state.customVal) $("scale-custom").value = state.customVal;
-  const d = denom();
-  $("scale-note").textContent = d
-    ? `At 1:${d}, 1 real foot is ${fmtS(304.8 / d, 1)} mm (${fracIn(12 / d)}) on the model.`
-    : "Enter a custom scale denominator.";
-}
-function recalcScale(){
-  const d = denom();
-  const rEl = $("real-val"), mEl = $("model-val");
-  const rUnit = $("real-unit").value, mUnit = $("model-unit").value;
-  const out = $("result"), alt = $("result-alt");
-  if (!d){ out.textContent = ""; alt.textContent = ""; return; }
-  if (state.scaleEdited !== "model"){
-    const v = parseVal(rEl.value);
-    if (!(v >= 0) || rEl.value === ""){ out.textContent = ""; alt.textContent = ""; return; }
-    const modelMm = (v * TO_MM[rUnit]) / d;
-    mEl.value = fmtS(modelMm / TO_MM[mUnit], 3);
-    out.textContent = fmtS(modelMm / TO_MM[mUnit], 2) + " " + mUnit + " on the model";
-    alt.textContent = `= ${fmtS(modelMm, 1)} mm · ${fracIn(modelMm / 25.4)}`;
-  } else {
-    const v = parseVal(mEl.value);
-    if (!(v >= 0) || mEl.value === ""){ out.textContent = ""; alt.textContent = ""; return; }
-    const realMm = v * TO_MM[mUnit] * d;
-    rEl.value = fmtS(realMm / TO_MM[rUnit], 3);
-    out.textContent = fmtReal(realMm) + " in the real world";
-    alt.textContent = `= ${fmtS(realMm / TO_MM[rUnit], 2)} ${rUnit}`;
-  }
-}
-function recalcWhatScale(){
-  const r = parseVal($("ws-real").value), m = parseVal($("ws-model").value);
-  const out = $("ws-result"), near = $("ws-nearest");
-  if (!(r > 0) || !(m > 0)){ out.textContent = ""; near.textContent = ""; return; }
-  const ratio = (r * TO_MM[$("ws-real-unit").value]) / (m * TO_MM[$("ws-model-unit").value]);
-  if (ratio < 1){ out.textContent = "Model is bigger than the real thing?"; near.textContent = ""; return; }
-  out.textContent = "1:" + fmtS(ratio, 1);
-  let best = null;
-  for (const [d, label] of SCALES){
-    const err = Math.abs(d - ratio) / d;
-    if (!best || err < best.err) best = { d, label, err };
-  }
-  near.innerHTML = best && best.err <= 0.08
-    ? `Closest common scale: <span class="scalename">1:${best.d}${best.label ? " (" + best.label + ")" : ""}</span>`
-    : "Not close to any common scale.";
-}
-
 /* ---------- wiring ---------- */
-$("from-val").addEventListener("input", () => { state.lastEdited = "from"; recalcUnits(); });
-$("to-val").addEventListener("input", () => { state.lastEdited = "to"; recalcUnits(); });
-$("from-unit").addEventListener("change", recalcUnits);
-$("to-unit").addEventListener("change", recalcUnits);
+$("sc-a").addEventListener("input", () => { buildScPresets(); recalcSc(); });
+$("sc-b").addEventListener("input", () => { buildScPresets(); recalcSc(); });
+$("sc-actual").addEventListener("input", () => { state.scSide = "actual"; recalcSc(); });
+$("sc-scale").addEventListener("input", () => { state.scSide = "scale"; recalcSc(); });
+$("sc-actual-unit").addEventListener("change", recalcSc);
+$("sc-scale-unit").addEventListener("change", recalcSc);
+for (const id of ["ws-real", "ws-model"]) $(id).addEventListener("input", recalcWhatScale);
+for (const id of ["ws-real-unit", "ws-model-unit"]) $(id).addEventListener("change", recalcWhatScale);
 
 $("ratio-preset").addEventListener("change", () => {
   const i = $("ratio-preset").value;
@@ -568,22 +563,10 @@ $("ratio-b").addEventListener("input", () => { $("ratio-preset").value = ""; rec
 $("ratio-from").addEventListener("input", () => { state.ratioEdited = "from"; recalcRatio(); });
 $("ratio-to").addEventListener("input", () => { state.ratioEdited = "to"; recalcRatio(); });
 
-$("scale-sel").addEventListener("change", () => {
-  const v = $("scale-sel").value;
-  state.custom = v === "custom";
-  if (!state.custom) state.denom = parseFloat(v);
-  save(); buildPicker(); recalcScale();
-});
-$("scale-custom").addEventListener("input", () => {
-  state.customVal = $("scale-custom").value;
-  save(); buildPicker(); recalcScale();
-});
-$("real-val").addEventListener("input", () => { state.scaleEdited = "real"; recalcScale(); });
-$("model-val").addEventListener("input", () => { state.scaleEdited = "model"; recalcScale(); });
-$("real-unit").addEventListener("change", recalcScale);
-$("model-unit").addEventListener("change", recalcScale);
-for (const id of ["ws-real", "ws-model"]) $(id).addEventListener("input", recalcWhatScale);
-for (const id of ["ws-real-unit", "ws-model-unit"]) $(id).addEventListener("change", recalcWhatScale);
+$("from-val").addEventListener("input", () => { state.lastEdited = "from"; recalcUnits(); });
+$("to-val").addEventListener("input", () => { state.lastEdited = "to"; recalcUnits(); });
+$("from-unit").addEventListener("change", recalcUnits);
+$("to-unit").addEventListener("change", recalcUnits);
 
 render();
 if ("serviceWorker" in navigator)
