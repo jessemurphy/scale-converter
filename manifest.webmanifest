@@ -1,7 +1,7 @@
 {
-  "name": "Scale Converter",
-  "short_name": "Scales",
-  "description": "Real size to model size and back, for any model scale.",
+  "name": "Unit Converter",
+  "short_name": "Convert",
+  "description": "Any unit to any unit — length, weight, volume, temperature, speed, area, and model scales.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f6f7f4",

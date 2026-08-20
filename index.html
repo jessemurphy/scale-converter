@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scale Converter</title>
+<title>Unit Converter</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Scales">
+<meta name="apple-mobile-web-app-title" content="Convert">
 <meta name="theme-color" content="#3a5a80">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -40,8 +40,8 @@ h2{font-size:14px;font-weight:700;text-transform:uppercase;
 .row{display:flex;gap:8px;margin:10px 0;align-items:center}
 input,select{font:inherit;color:var(--ink);background:var(--card);
   border:1px solid var(--rule);border-radius:10px;padding:11px 12px}
-input[type=number],input[type=text]{width:100%;font-variant-numeric:tabular-nums}
-select{flex-shrink:0}
+input[type=number]{width:100%;font-variant-numeric:tabular-nums}
+select{flex-shrink:0;max-width:46%}
 label{font-size:13px;font-weight:700;text-transform:uppercase;
   letter-spacing:.07em;color:var(--muted);display:block;margin:0 0 6px}
 .swap{display:flex;justify-content:center;margin:2px 0;color:var(--muted);
@@ -51,11 +51,15 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
 .sub{color:var(--muted);font-size:14px;margin:2px 0 0;
   font-variant-numeric:tabular-nums}
 .hint{color:var(--muted);font-size:13.5px;line-height:1.55}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .chip{font:inherit;font-size:13.5px;padding:7px 12px;cursor:pointer;
   border:1px solid var(--rule);background:var(--card);color:var(--muted);
   border-radius:10px;font-weight:600}
 .chip.on{color:var(--accent);border-color:var(--accent);font-weight:700}
+.all{margin:14px 0 0;border-top:1px solid var(--rule);padding-top:8px}
+.all-row{display:flex;justify-content:space-between;gap:12px;padding:5px 2px;
+  font-size:15px;font-variant-numeric:tabular-nums}
+.all-row .u{color:var(--muted)}
 .scalename{color:var(--gold);font-weight:700}
 .foot{margin-top:36px;padding-top:12px;border-top:1px solid var(--rule);
   color:var(--muted);font-size:12.5px;line-height:1.6}
@@ -64,88 +68,221 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
 </head>
 <body>
 <main>
-  <header class="top"><span class="brand">Scale Converter</span>
-    <span class="tagline">real world &harr; model world</span></header>
+  <header class="top"><span class="brand">Convert</span>
+    <span class="tagline">any unit to any unit</span></header>
 
-  <h2>Scale</h2>
-  <div class="card">
-    <div class="row">
-      <select id="scale-sel" style="flex:1" aria-label="Scale"></select>
-      <input type="number" id="scale-custom" class="hide" inputmode="decimal"
-             min="0" step="any" placeholder="87" style="width:110px"
-             aria-label="Custom scale denominator">
-    </div>
-    <div class="chips" id="fav-chips"></div>
-    <p class="hint" id="scale-note"></p>
-  </div>
+  <div class="chips" id="cat-chips"></div>
 
-  <h2>Convert</h2>
-  <div class="card">
-    <label for="real-val">Real-world size</label>
-    <div class="row" style="margin-top:0">
-      <input type="number" id="real-val" inputmode="decimal" min="0" step="any"
-             placeholder="e.g. 6">
-      <select id="real-unit" aria-label="Real-world unit">
-        <option value="ft">ft</option>
-        <option value="in">in</option>
-        <option value="m">m</option>
-        <option value="cm">cm</option>
-        <option value="mm">mm</option>
-      </select>
+  <!-- ============ units ============ -->
+  <section id="v-units">
+    <div class="card">
+      <label for="from-val">From</label>
+      <div class="row" style="margin-top:0">
+        <input type="number" id="from-val" inputmode="decimal" step="any"
+               placeholder="value">
+        <select id="from-unit" aria-label="From unit"></select>
+      </div>
+      <div class="swap">&darr;&uarr;</div>
+      <label for="to-val">To</label>
+      <div class="row" style="margin-top:0">
+        <input type="number" id="to-val" inputmode="decimal" step="any"
+               placeholder="value">
+        <select id="to-unit" aria-label="To unit"></select>
+      </div>
+      <p class="big" id="u-result"></p>
+      <div class="all" id="u-all"></div>
     </div>
-    <div class="swap">&darr;&uarr;</div>
-    <label for="model-val">Model size</label>
-    <div class="row" style="margin-top:0">
-      <input type="number" id="model-val" inputmode="decimal" min="0" step="any"
-             placeholder="e.g. 21">
-      <select id="model-unit" aria-label="Model unit">
-        <option value="mm">mm</option>
-        <option value="in">in</option>
-        <option value="cm">cm</option>
-      </select>
-    </div>
-    <p class="big" id="result"></p>
-    <p class="sub" id="result-alt"></p>
-  </div>
+  </section>
 
-  <h2>What scale is it?</h2>
-  <div class="card">
-    <p class="hint" style="margin-top:0">Measure the real thing and the model —
-      this works out the ratio.</p>
-    <label for="ws-real">Real size</label>
-    <div class="row" style="margin-top:0">
-      <input type="number" id="ws-real" inputmode="decimal" min="0" step="any">
-      <select id="ws-real-unit">
-        <option value="ft">ft</option>
-        <option value="in">in</option>
-        <option value="m">m</option>
-        <option value="cm">cm</option>
-        <option value="mm">mm</option>
-      </select>
+  <!-- ============ model scale (kept as one more category) ============ -->
+  <section id="v-scale" class="hide">
+    <div class="card">
+      <label for="scale-sel">Scale</label>
+      <div class="row" style="margin-top:0">
+        <select id="scale-sel" style="flex:1;max-width:none" aria-label="Scale"></select>
+        <input type="number" id="scale-custom" class="hide" inputmode="decimal"
+               min="0" step="any" placeholder="87" style="width:110px"
+               aria-label="Custom scale denominator">
+      </div>
+      <p class="hint" id="scale-note"></p>
+      <label for="real-val" style="margin-top:14px">Real-world size</label>
+      <div class="row" style="margin-top:0">
+        <input type="number" id="real-val" inputmode="decimal" min="0" step="any"
+               placeholder="e.g. 6">
+        <select id="real-unit" aria-label="Real-world unit">
+          <option value="ft">ft</option><option value="in">in</option>
+          <option value="m">m</option><option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+      <div class="swap">&darr;&uarr;</div>
+      <label for="model-val">Model size</label>
+      <div class="row" style="margin-top:0">
+        <input type="number" id="model-val" inputmode="decimal" min="0" step="any"
+               placeholder="e.g. 21">
+        <select id="model-unit" aria-label="Model unit">
+          <option value="mm">mm</option><option value="in">in</option>
+          <option value="cm">cm</option>
+        </select>
+      </div>
+      <p class="big" id="result"></p>
+      <p class="sub" id="result-alt"></p>
     </div>
-    <label for="ws-model">Model size</label>
-    <div class="row" style="margin-top:0">
-      <input type="number" id="ws-model" inputmode="decimal" min="0" step="any">
-      <select id="ws-model-unit">
-        <option value="mm">mm</option>
-        <option value="in">in</option>
-        <option value="cm">cm</option>
-      </select>
+
+    <h2>What scale is it?</h2>
+    <div class="card">
+      <p class="hint" style="margin-top:0">Measure the real thing and the model —
+        this works out the ratio.</p>
+      <label for="ws-real">Real size</label>
+      <div class="row" style="margin-top:0">
+        <input type="number" id="ws-real" inputmode="decimal" min="0" step="any">
+        <select id="ws-real-unit">
+          <option value="ft">ft</option><option value="in">in</option>
+          <option value="m">m</option><option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+      <label for="ws-model">Model size</label>
+      <div class="row" style="margin-top:0">
+        <input type="number" id="ws-model" inputmode="decimal" min="0" step="any">
+        <select id="ws-model-unit">
+          <option value="mm">mm</option><option value="in">in</option>
+          <option value="cm">cm</option>
+        </select>
+      </div>
+      <p class="big" id="ws-result"></p>
+      <p class="sub" id="ws-nearest"></p>
     </div>
-    <p class="big" id="ws-result"></p>
-    <p class="sub" id="ws-nearest"></p>
-  </div>
+  </section>
 
   <p class="foot">Everything runs on this device — no network needed after the
-    first load. Model sizes round to the nearest 1/32&Prime; for inches.
-    <span style="opacity:.6">v1</span></p>
+    first load. <span style="opacity:.6">v2</span></p>
 </main>
 
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
 
-/* Common scales: denominator, label. Order: finest detail to smallest. */
+/* ---------- unit categories: factor = size of one unit in the base unit.
+   Temperature is affine, handled by functions instead. ---------- */
+const CATS = {
+  Length: { units: {
+    mm: 0.001, cm: 0.01, m: 1, km: 1000,
+    in: 0.0254, ft: 0.3048, yd: 0.9144, mi: 1609.344,
+  }, def: ["ft", "m"] },
+  Weight: { units: {
+    g: 0.001, kg: 1, oz: 0.0283495, lb: 0.45359237,
+    stone: 6.35029318, "US ton": 907.18474, "metric ton": 1000,
+  }, def: ["lb", "kg"] },
+  Volume: { units: {
+    mL: 0.001, L: 1, tsp: 0.00492892159, tbsp: 0.0147867648,
+    "fl oz": 0.0295735296, cup: 0.2365882365, pint: 0.473176473,
+    quart: 0.946352946, gallon: 3.785411784,
+  }, def: ["cup", "mL"] },
+  Temperature: { affine: true, units: {
+    "°F": { toBase: v => (v - 32) * 5 / 9, fromBase: v => v * 9 / 5 + 32 },
+    "°C": { toBase: v => v, fromBase: v => v },
+    K:    { toBase: v => v - 273.15, fromBase: v => v + 273.15 },
+  }, def: ["°F", "°C"] },
+  Speed: { units: {
+    mph: 0.44704, "km/h": 0.2777778, "m/s": 1, knots: 0.5144444,
+  }, def: ["mph", "km/h"] },
+  Area: { units: {
+    "sq in": 0.00064516, "sq ft": 0.09290304, "sq yd": 0.83612736,
+    "sq m": 1, acre: 4046.8564224, hectare: 10000,
+    "sq km": 1e6, "sq mi": 2589988.110336,
+  }, def: ["sq ft", "sq m"] },
+};
+const SCALE_CAT = "Model scale";
+
+const KEY = "unitconv:v1";
+let state = { cat: "Length", units: {}, lastEdited: "from",
+              denom: 87, custom: false };
+try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch {}
+if (!CATS[state.cat] && state.cat !== SCALE_CAT) state.cat = "Length";
+const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+
+function fmt(n, digits = 4){
+  if (!isFinite(n)) return "—";
+  if (n !== 0 && Math.abs(n) < 1e-6) return n.toExponential(3);
+  const r = Math.abs(n) >= 1000 ? n.toFixed(2) : n.toPrecision(6);
+  const s = String(parseFloat(r));
+  return Math.abs(n) >= 1000 ? parseFloat(s).toLocaleString(undefined, {maximumFractionDigits: 2}) : s;
+}
+
+/* ---------- category chips ---------- */
+function buildChips(){
+  const box = $("cat-chips");
+  box.innerHTML = "";
+  for (const name of [...Object.keys(CATS), SCALE_CAT]){
+    const b = document.createElement("button");
+    b.className = "chip" + (state.cat === name ? " on" : "");
+    b.textContent = name;
+    b.onclick = () => { state.cat = name; save(); render(); };
+    box.appendChild(b);
+  }
+}
+
+function render(){
+  buildChips();
+  const scale = state.cat === SCALE_CAT;
+  $("v-units").classList.toggle("hide", scale);
+  $("v-scale").classList.toggle("hide", !scale);
+  if (scale){ buildPicker(); recalcScale(); }
+  else { buildUnitSelects(); recalcUnits(); }
+}
+
+/* ---------- generic unit conversion ---------- */
+function convert(cat, v, from, to){
+  const c = CATS[cat];
+  if (c.affine){
+    return c.units[to].fromBase(c.units[from].toBase(v));
+  }
+  return (v * c.units[from]) / c.units[to];
+}
+
+function buildUnitSelects(){
+  const c = CATS[state.cat];
+  const chosen = state.units[state.cat] || c.def;
+  for (const [selId, idx] of [["from-unit", 0], ["to-unit", 1]]){
+    const sel = $(selId);
+    sel.innerHTML = "";
+    for (const u of Object.keys(c.units)){
+      const o = document.createElement("option");
+      o.value = u; o.textContent = u;
+      sel.appendChild(o);
+    }
+    sel.value = c.units[chosen[idx]] !== undefined ? chosen[idx] : Object.keys(c.units)[0];
+  }
+}
+
+function recalcUnits(){
+  const cat = state.cat, from = $("from-unit").value, to = $("to-unit").value;
+  state.units[cat] = [from, to]; save();
+  const src = state.lastEdited === "from" ? $("from-val") : $("to-val");
+  const dst = state.lastEdited === "from" ? $("to-val") : $("from-val");
+  const out = $("u-result"), all = $("u-all");
+  const v = parseFloat(src.value);
+  if (src.value === "" || !isFinite(v)){
+    dst.value = ""; out.textContent = ""; all.innerHTML = ""; return;
+  }
+  const a = state.lastEdited === "from" ? from : to;
+  const b = state.lastEdited === "from" ? to : from;
+  const res = convert(cat, v, a, b);
+  dst.value = fmt(res);
+  out.textContent = `${fmt(v)} ${a} = ${fmt(res)} ${b}`;
+  // breakdown: the edited value in every unit of the category
+  all.innerHTML = "";
+  for (const u of Object.keys(CATS[cat].units)){
+    if (u === a) continue;
+    const row = document.createElement("div");
+    row.className = "all-row";
+    row.innerHTML = `<span class="u">${u}</span><span>${fmt(convert(cat, v, a, u))}</span>`;
+    all.appendChild(row);
+  }
+}
+
+/* ================= model scale (unchanged behavior) ================= */
 const SCALES = [
   [4, ""], [6, "action figures"], [8, ""], [10, ""],
   [12, "1″ dollhouse"], [16, ""], [18, "diecast cars"],
@@ -158,13 +295,7 @@ const SCALES = [
   [144, "aircraft"], [160, "N railway"], [220, "Z railway"],
   [285, "6mm wargaming"], [350, "ship models"], [700, "ship models"],
 ];
-const FAVS = [87, 48, 64, 160, 24];   // quick chips
 const TO_MM = { mm: 1, cm: 10, m: 1000, in: 25.4, ft: 304.8 };
-
-const KEY = "scaleconv:v1";
-let state = { denom: 87, custom: false, lastEdited: "real" };
-try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch {}
-const save = () => localStorage.setItem(KEY, JSON.stringify(state));
 
 function denom(){
   if (state.custom){
@@ -173,12 +304,6 @@ function denom(){
   }
   return state.denom;
 }
-function scaleLabel(d){
-  const hit = SCALES.find(([n]) => n === d);
-  return hit && hit[1] ? hit[1] : "";
-}
-
-/* ---------- fractions ---------- */
 function fracIn(inches){
   const whole = Math.floor(inches);
   let num = Math.round((inches - whole) * 32), den = 32;
@@ -187,23 +312,19 @@ function fracIn(inches){
   if (num === 0) return `${whole}″`;
   return (whole ? whole + " " : "") + `${num}/${den}″`;
 }
-function fmt(n, digits = 2){
+function fmtS(n, digits = 2){
   if (!isFinite(n)) return "—";
-  const r = n.toFixed(digits);
-  return String(parseFloat(r));
+  return String(parseFloat(n.toFixed(digits)));
 }
-/* A real-world length in mm, shown in sensible units. */
 function fmtReal(mm){
   if (mm >= 304.8){
     const ft = Math.floor(mm / 304.8);
     const inch = (mm - ft * 304.8) / 25.4;
-    return inch > 0.05 ? `${ft} ft ${fmt(inch, 1)} in` : `${ft} ft`;
+    return inch > 0.05 ? `${ft} ft ${fmtS(inch, 1)} in` : `${ft} ft`;
   }
-  if (mm >= 25.4) return fmt(mm / 25.4, 2) + " in";
-  return fmt(mm, 1) + " mm";
+  if (mm >= 25.4) return fmtS(mm / 25.4, 2) + " in";
+  return fmtS(mm, 1) + " mm";
 }
-
-/* ---------- scale picker ---------- */
 function buildPicker(){
   const sel = $("scale-sel");
   sel.innerHTML = "";
@@ -220,55 +341,40 @@ function buildPicker(){
   sel.value = state.custom ? "custom" : String(state.denom);
   $("scale-custom").classList.toggle("hide", !state.custom);
   if (state.custom && state.customVal) $("scale-custom").value = state.customVal;
-
-  const chips = $("fav-chips");
-  chips.innerHTML = "";
-  for (const d of FAVS){
-    const b = document.createElement("button");
-    b.className = "chip" + (!state.custom && state.denom === d ? " on" : "");
-    b.textContent = "1:" + d;
-    b.onclick = () => { state.custom = false; state.denom = d; save(); buildPicker(); recalc(); };
-    chips.appendChild(b);
-  }
   const d = denom();
   $("scale-note").textContent = d
-    ? `At 1:${d}, 1 real foot is ${fmt(304.8 / d, 1)} mm (${fracIn(12 / d)}) on the model.`
+    ? `At 1:${d}, 1 real foot is ${fmtS(304.8 / d, 1)} mm (${fracIn(12 / d)}) on the model.`
     : "Enter a custom scale denominator.";
 }
-
-/* ---------- converter ---------- */
-function recalc(){
+function recalcScale(){
   const d = denom();
   const rEl = $("real-val"), mEl = $("model-val");
   const rUnit = $("real-unit").value, mUnit = $("model-unit").value;
   const out = $("result"), alt = $("result-alt");
   if (!d){ out.textContent = ""; alt.textContent = ""; return; }
-
-  if (state.lastEdited === "real"){
+  if (state.scaleEdited !== "model"){
     const v = parseFloat(rEl.value);
     if (!(v >= 0) || rEl.value === ""){ out.textContent = ""; alt.textContent = ""; return; }
     const modelMm = (v * TO_MM[rUnit]) / d;
-    mEl.value = fmt(modelMm / TO_MM[mUnit], 3);
-    out.textContent = fmt(modelMm / TO_MM[mUnit], 2) + " " + mUnit + " on the model";
-    alt.textContent = `= ${fmt(modelMm, 1)} mm · ${fracIn(modelMm / 25.4)}`;
+    mEl.value = fmtS(modelMm / TO_MM[mUnit], 3);
+    out.textContent = fmtS(modelMm / TO_MM[mUnit], 2) + " " + mUnit + " on the model";
+    alt.textContent = `= ${fmtS(modelMm, 1)} mm · ${fracIn(modelMm / 25.4)}`;
   } else {
     const v = parseFloat(mEl.value);
     if (!(v >= 0) || mEl.value === ""){ out.textContent = ""; alt.textContent = ""; return; }
     const realMm = v * TO_MM[mUnit] * d;
-    rEl.value = fmt(realMm / TO_MM[rUnit], 3);
+    rEl.value = fmtS(realMm / TO_MM[rUnit], 3);
     out.textContent = fmtReal(realMm) + " in the real world";
-    alt.textContent = `= ${fmt(realMm / TO_MM[rUnit], 2)} ${rUnit}`;
+    alt.textContent = `= ${fmtS(realMm / TO_MM[rUnit], 2)} ${rUnit}`;
   }
 }
-
-/* ---------- what scale is it ---------- */
 function recalcWhatScale(){
   const r = parseFloat($("ws-real").value), m = parseFloat($("ws-model").value);
   const out = $("ws-result"), near = $("ws-nearest");
   if (!(r > 0) || !(m > 0)){ out.textContent = ""; near.textContent = ""; return; }
   const ratio = (r * TO_MM[$("ws-real-unit").value]) / (m * TO_MM[$("ws-model-unit").value]);
   if (ratio < 1){ out.textContent = "Model is bigger than the real thing?"; near.textContent = ""; return; }
-  out.textContent = "1:" + fmt(ratio, 1);
+  out.textContent = "1:" + fmtS(ratio, 1);
   let best = null;
   for (const [d, label] of SCALES){
     const err = Math.abs(d - ratio) / d;
@@ -280,25 +386,29 @@ function recalcWhatScale(){
 }
 
 /* ---------- wiring ---------- */
+$("from-val").addEventListener("input", () => { state.lastEdited = "from"; recalcUnits(); });
+$("to-val").addEventListener("input", () => { state.lastEdited = "to"; recalcUnits(); });
+$("from-unit").addEventListener("change", recalcUnits);
+$("to-unit").addEventListener("change", recalcUnits);
+
 $("scale-sel").addEventListener("change", () => {
   const v = $("scale-sel").value;
   state.custom = v === "custom";
   if (!state.custom) state.denom = parseFloat(v);
-  save(); buildPicker(); recalc();
+  save(); buildPicker(); recalcScale();
 });
 $("scale-custom").addEventListener("input", () => {
   state.customVal = $("scale-custom").value;
-  save(); buildPicker(); recalc();
+  save(); buildPicker(); recalcScale();
 });
-$("real-val").addEventListener("input", () => { state.lastEdited = "real"; save(); recalc(); });
-$("model-val").addEventListener("input", () => { state.lastEdited = "model"; save(); recalc(); });
-$("real-unit").addEventListener("change", recalc);
-$("model-unit").addEventListener("change", recalc);
+$("real-val").addEventListener("input", () => { state.scaleEdited = "real"; recalcScale(); });
+$("model-val").addEventListener("input", () => { state.scaleEdited = "model"; recalcScale(); });
+$("real-unit").addEventListener("change", recalcScale);
+$("model-unit").addEventListener("change", recalcScale);
 for (const id of ["ws-real", "ws-model"]) $(id).addEventListener("input", recalcWhatScale);
 for (const id of ["ws-real-unit", "ws-model-unit"]) $(id).addEventListener("change", recalcWhatScale);
 
-buildPicker();
-recalc();
+render();
 if ("serviceWorker" in navigator)
   navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
