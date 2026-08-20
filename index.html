@@ -72,6 +72,11 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
     <span class="tagline">any unit to any unit</span></header>
 
   <div class="chips" id="cat-chips"></div>
+  <div class="chips" id="disp-chips" style="margin-top:-6px">
+    <button class="chip" data-d="dec" onclick="setDisp('dec')">0.75</button>
+    <button class="chip" data-d="frac" onclick="setDisp('frac')">3/4</button>
+    <span class="hint" style="align-self:center">result style</span>
+  </div>
 
   <!-- ============ units ============ -->
   <section id="v-units">
@@ -97,7 +102,11 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
   <!-- ============ custom ratio ============ -->
   <section id="v-ratio" class="hide">
     <div class="card">
-      <label>Ratio &mdash; from : to</label>
+      <label for="ratio-preset">Preset</label>
+      <div class="row" style="margin-top:0">
+        <select id="ratio-preset" style="flex:1;max-width:none"></select>
+      </div>
+      <label style="margin-top:14px">Ratio &mdash; from : to</label>
       <div class="row" style="margin-top:0">
         <input type="text" id="ratio-a" placeholder="2" autocomplete="off"
                autocapitalize="off" spellcheck="false">
@@ -182,7 +191,7 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
   </section>
 
   <p class="foot">Everything runs on this device — no network needed after the
-    first load. <span style="opacity:.6">v3</span></p>
+    first load. <span style="opacity:.6">v4</span></p>
 </main>
 
 <script>
@@ -236,9 +245,26 @@ function parseVal(s){
   return parseFloat(s);
 }
 
+/* Preloaded ratios for the Ratio tab. [label, from, to] */
+const RATIO_PRESETS = [
+  ["Double it (1 : 2)", "1", "2"],
+  ["Halve it (2 : 1)", "2", "1"],
+  ["Recipe \u00d71.5 (2 : 3)", "2", "3"],
+  ["Recipe \u00d73/4 (4 : 3)", "4", "3"],
+  ["Recipe \u00d72/3 (3 : 2)", "3", "2"],
+  ["Recipe \u00d71/3 (3 : 1)", "3", "1"],
+  ["USGS topo map (1 : 24,000)", "1", "24000"],
+  ["Map 1 : 100,000", "1", "100000"],
+  ["Golden ratio (1 : 1.618)", "1", "1.618"],
+  ["16:9 screen", "16", "9"],
+  ["4:3 screen", "4", "3"],
+  ["3:2 photo", "3", "2"],
+  ["A-series paper (1 : \u221a2)", "1", "1.41421356"],
+];
+
 const KEY = "unitconv:v1";
 let state = { cat: "Length", units: {}, lastEdited: "from",
-              denom: 87, custom: false };
+              denom: 87, custom: false, disp: "dec" };
 try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch {}
 if (!CATS[state.cat] && state.cat !== SCALE_CAT) state.cat = "Length";
 const save = () => localStorage.setItem(KEY, JSON.stringify(state));
@@ -249,6 +275,42 @@ function fmt(n, digits = 4){
   const r = Math.abs(n) >= 1000 ? n.toFixed(2) : n.toPrecision(6);
   const s = String(parseFloat(r));
   return Math.abs(n) >= 1000 ? parseFloat(s).toLocaleString(undefined, {maximumFractionDigits: 2}) : s;
+}
+
+/* Nearest fraction (denominators to 64). Falls back to the decimal when
+   no small fraction is close; prefixes \u2248 when it's near but not exact. */
+function toFrac(n){
+  if (!isFinite(n)) return "\u2014";
+  const sign = n < 0 ? "-" : "";
+  const a = Math.abs(n);
+  const whole = Math.floor(a);
+  const frac = a - whole;
+  if (frac < 1e-9) return sign + whole;
+  let bN = 0, bD = 1, bErr = frac;
+  // Only denominators people actually use — searching every d up to 64
+  // "finds" absurdities like 2/51 for what is really just a decimal.
+  for (const d of [2, 3, 4, 5, 6, 8, 10, 12, 16, 32, 64]){
+    const num = Math.round(frac * d);
+    const err = Math.abs(frac - num / d);
+    if (err < bErr - 1e-12){ bErr = err; bN = num; bD = d; }
+  }
+  if (bErr > 0.002) return fmt(n);        // not meaningfully a fraction
+  if (bN === bD) return sign + (whole + 1);
+  if (bN === 0) return sign + whole;
+  let g = (x, y) => y ? g(y, x % y) : x;
+  const c = g(bN, bD);
+  const approx = bErr > 1e-6 ? "\u2248 " : "";
+  return approx + sign + (whole ? whole + " " : "") + (bN / c) + "/" + (bD / c);
+}
+function fmtOut(n){ return state.disp === "frac" ? toFrac(n) : fmt(n); }
+function setDisp(d){
+  state.disp = d; save();
+  markDisp();
+  if (state.cat === RATIO_CAT) recalcRatio(); else if (state.cat !== SCALE_CAT) recalcUnits();
+}
+function markDisp(){
+  document.querySelectorAll("#disp-chips .chip").forEach(b =>
+    b.classList.toggle("on", (state.disp || "dec") === b.dataset.d));
 }
 
 /* ---------- category chips ---------- */
@@ -271,8 +333,11 @@ function render(){
   $("v-units").classList.toggle("hide", mode !== "units");
   $("v-ratio").classList.toggle("hide", mode !== "ratio");
   $("v-scale").classList.toggle("hide", mode !== "scale");
+  $("disp-chips").classList.toggle("hide", mode === "scale");
+  markDisp();
   if (mode === "scale"){ buildPicker(); recalcScale(); }
   else if (mode === "ratio"){
+    buildRatioPresets();
     if (state.ratioA !== undefined) $("ratio-a").value = state.ratioA;
     if (state.ratioB !== undefined) $("ratio-b").value = state.ratioB;
     recalcRatio();
@@ -281,6 +346,18 @@ function render(){
 }
 
 /* ---------- custom ratio ---------- */
+function buildRatioPresets(){
+  const sel = $("ratio-preset");
+  if (sel.options.length) return;
+  const ph = document.createElement("option");
+  ph.value = ""; ph.textContent = "Choose a preset\u2026";
+  sel.appendChild(ph);
+  RATIO_PRESETS.forEach(([label], i) => {
+    const o = document.createElement("option");
+    o.value = i; o.textContent = label;
+    sel.appendChild(o);
+  });
+}
 function recalcRatio(){
   state.ratioA = $("ratio-a").value; state.ratioB = $("ratio-b").value; save();
   const a = parseVal(state.ratioA), b = parseVal(state.ratioB);
@@ -296,9 +373,9 @@ function recalcRatio(){
     return;
   }
   const res = fromSide ? (v * b) / a : (v * a) / b;
-  dst.value = fmt(res);
+  dst.value = fmtOut(res);
   const f = fromSide ? v : res, t = fromSide ? res : v;
-  out.textContent = `${fmt(f)} → ${fmt(t)}`;
+  out.textContent = `${fmtOut(f)} → ${fmtOut(t)}`;
   fac.textContent = `at ${state.ratioA} : ${state.ratioB} (× ${fmt(b / a)})`;
 }
 
@@ -339,15 +416,15 @@ function recalcUnits(){
   const a = state.lastEdited === "from" ? from : to;
   const b = state.lastEdited === "from" ? to : from;
   const res = convert(cat, v, a, b);
-  dst.value = fmt(res);
-  out.textContent = `${fmt(v)} ${a} = ${fmt(res)} ${b}`;
+  dst.value = fmtOut(res);
+  out.textContent = `${fmtOut(v)} ${a} = ${fmtOut(res)} ${b}`;
   // breakdown: the edited value in every unit of the category
   all.innerHTML = "";
   for (const u of Object.keys(CATS[cat].units)){
     if (u === a) continue;
     const row = document.createElement("div");
     row.className = "all-row";
-    row.innerHTML = `<span class="u">${u}</span><span>${fmt(convert(cat, v, a, u))}</span>`;
+    row.innerHTML = `<span class="u">${u}</span><span>${fmtOut(convert(cat, v, a, u))}</span>`;
     all.appendChild(row);
   }
 }
@@ -461,8 +538,15 @@ $("to-val").addEventListener("input", () => { state.lastEdited = "to"; recalcUni
 $("from-unit").addEventListener("change", recalcUnits);
 $("to-unit").addEventListener("change", recalcUnits);
 
-$("ratio-a").addEventListener("input", recalcRatio);
-$("ratio-b").addEventListener("input", recalcRatio);
+$("ratio-preset").addEventListener("change", () => {
+  const i = $("ratio-preset").value;
+  if (i === "") return;
+  const [, a, b] = RATIO_PRESETS[Number(i)];
+  $("ratio-a").value = a; $("ratio-b").value = b;
+  recalcRatio();
+});
+$("ratio-a").addEventListener("input", () => { $("ratio-preset").value = ""; recalcRatio(); });
+$("ratio-b").addEventListener("input", () => { $("ratio-preset").value = ""; recalcRatio(); });
 $("ratio-from").addEventListener("input", () => { state.ratioEdited = "from"; recalcRatio(); });
 $("ratio-to").addEventListener("input", () => { state.ratioEdited = "to"; recalcRatio(); });
 
