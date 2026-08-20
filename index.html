@@ -79,6 +79,8 @@ h2{font-size:14px;font-weight:700;text-transform:uppercase;
   text-transform:uppercase;letter-spacing:.07em}
 #sc-presets{gap:6px;margin-top:10px}
 #sc-presets .chip{font-size:12.5px;padding:5px 10px}
+.rlab{flex:1;text-align:center;font-size:11px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em}
 .chip.del{color:#b04a3a;border-color:#b04a3a}
 .chip.add{color:var(--accent);border-color:var(--accent)}
 details{margin:4px 0 10px}
@@ -115,16 +117,12 @@ details[open] summary::before{content:"\25BE  "}
         <input type="text" id="sc-b" value="100" autocomplete="off"
                autocapitalize="off" spellcheck="false" aria-label="Actual side">
       </div>
-      <div class="chips" id="sc-presets"></div>
-    </div>
-
-    <div class="card">
-      <label id="sc-actual-label"><span class="dot"></span>Actual length</label>
-      <div class="row">
-        <input type="text" id="sc-actual" placeholder="0" autocomplete="off"
-               autocapitalize="off" spellcheck="false">
-        <select id="sc-actual-unit" aria-label="Actual unit"></select>
+      <div class="row" style="margin-top:4px">
+        <span class="rlab">scale</span>
+        <span style="width:14px"></span>
+        <span class="rlab">actual</span>
       </div>
+      <div class="chips" id="sc-presets"></div>
     </div>
 
     <div class="card">
@@ -133,6 +131,15 @@ details[open] summary::before{content:"\25BE  "}
         <input type="text" id="sc-scale" placeholder="0" autocomplete="off"
                autocapitalize="off" spellcheck="false">
         <select id="sc-scale-unit" aria-label="Scale unit"></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <label id="sc-actual-label"><span class="dot"></span>Actual length</label>
+      <div class="row">
+        <input type="text" id="sc-actual" placeholder="0" autocomplete="off"
+               autocapitalize="off" spellcheck="false">
+        <select id="sc-actual-unit" aria-label="Actual unit"></select>
       </div>
     </div>
 
@@ -208,7 +215,7 @@ details[open] summary::before{content:"\25BE  "}
 
   <p class="foot">Works offline &middot; mm, cm, m, km, in, ft, yd, mi, nmi<br>
     Add to Home Screen in Safari for an app-like experience.
-    <span style="opacity:.6">v8</span></p>
+    <span style="opacity:.6">v9</span></p>
 </main>
 
 <script>
