@@ -191,7 +191,7 @@ label{font-size:13px;font-weight:700;text-transform:uppercase;
   </section>
 
   <p class="foot">Everything runs on this device — no network needed after the
-    first load. <span style="opacity:.6">v4</span></p>
+    first load. <span style="opacity:.6">v5</span></p>
 </main>
 
 <script>
@@ -303,9 +303,26 @@ function toFrac(n){
   return approx + sign + (whole ? whole + " " : "") + (bN / c) + "/" + (bD / c);
 }
 function fmtOut(n){ return state.disp === "frac" ? toFrac(n) : fmt(n); }
+/* The display toggle also drives the phone keyboard: decimal mode gets
+   the numeric pad, fraction mode the full keyboard (for "/"). Temperature
+   keeps the full keyboard either way — the iOS decimal pad has no minus
+   key and temperatures go negative. */
+const VAL_INPUTS = ["from-val", "to-val", "ratio-a", "ratio-b", "ratio-from",
+  "ratio-to", "scale-custom", "real-val", "model-val", "ws-real", "ws-model"];
+function applyInputMode(){
+  const dec = (state.disp || "dec") === "dec";
+  for (const id of VAL_INPUTS){
+    const el = $(id);
+    const noPad = !dec ||
+      ((id === "from-val" || id === "to-val") && state.cat === "Temperature");
+    if (noPad) el.removeAttribute("inputmode");
+    else el.setAttribute("inputmode", "decimal");
+  }
+}
 function setDisp(d){
   state.disp = d; save();
   markDisp();
+  applyInputMode();
   if (state.cat === RATIO_CAT) recalcRatio(); else if (state.cat !== SCALE_CAT) recalcUnits();
 }
 function markDisp(){
@@ -335,6 +352,7 @@ function render(){
   $("v-scale").classList.toggle("hide", mode !== "scale");
   $("disp-chips").classList.toggle("hide", mode === "scale");
   markDisp();
+  applyInputMode();
   if (mode === "scale"){ buildPicker(); recalcScale(); }
   else if (mode === "ratio"){
     buildRatioPresets();

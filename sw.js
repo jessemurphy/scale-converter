@@ -1,6 +1,6 @@
 /* Scale Converter service worker: network-first so a new deploy shows up
    on the next load, full cache fallback so it opens offline. */
-const CACHE = "scales-v4";
+const CACHE = "scales-v5";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest",
                 "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png"];
 
